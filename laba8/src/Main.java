@@ -1,3 +1,4 @@
+import com.sun.security.auth.NTSidUserPrincipal;
 import functions.*;
 import functions.basic.*;
 import threads.*;
@@ -93,17 +94,16 @@ public class Main {
         Function f = new Cos();
         TabulatedFunction tf;
         try {
+            System.out.println("Test default constructor:");
             tf = TabulatedFunctions.tabulate(f, 0, Math.PI, 11);
             System.out.println(tf.getClass());
-        }
-        catch (Exception ex){
 
-        }
-        try {
+            System.out.println("Test Linked List factory:");
             TabulatedFunctions.setTabulatedFunctionFactory(new LinkedListTabulatedFunction.LinkedListTabulatedFunctionFactory());
             tf = TabulatedFunctions.tabulate(f, 0, Math.PI, 11);
             System.out.println(tf.getClass());
 
+            System.out.println("Test Array factory:");
             TabulatedFunctions.setTabulatedFunctionFactory(new ArrayTabulatedFunction.ArrayTabulatedFunctionFactory());
             TabulatedFunctions.tabulate(f, 0, Math.PI, 11);
             System.out.println(tf.getClass());
@@ -115,12 +115,30 @@ public class Main {
 
     public static void Task3output(){
         System.out.println("\n\n TASK 3");
-        try{
-            simpleThreads();
-        }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-        }
+        TabulatedFunction F;
+        System.out.println("Test 1st method");
+        F = TabulatedFunctions.createTabulatedFunction(ArrayTabulatedFunction.class, 0, 10 , 3);
+        System.out.println(F.getClass());
+        System.out.println(F);
+
+        System.out.println("Test 2nd method");
+        F = TabulatedFunctions.createTabulatedFunction(ArrayTabulatedFunction.class, 0, 10 , new double[] {0, 10});
+        System.out.println(F.getClass());
+        System.out.println(F);
+
+        System.out.println("Test 3rd method");
+        F = TabulatedFunctions.createTabulatedFunction(LinkedListTabulatedFunction.class, new FunctionPoint[]{
+                        new FunctionPoint(0, 0),
+                        new FunctionPoint(10, 10)
+                }
+        );
+        System.out.println(F.getClass());
+        System.out.println(F);
+
+        System.out.println("Test 4th method");
+        F = TabulatedFunctions.tabulate(LinkedListTabulatedFunction.class, new Sin(), 0, Math.PI, 11);
+        System.out.println(F.getClass());
+        System.out.println(F);
     }
 
     public static void Task4output(){
@@ -142,7 +160,7 @@ public class Main {
     public static void main(String[] args){
         Task1output();
         Task2output();
-        //Task3output();
+        Task3output();
         //wait(30);
         //Task4output();
     }

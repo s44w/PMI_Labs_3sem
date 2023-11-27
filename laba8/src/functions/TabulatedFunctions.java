@@ -74,7 +74,9 @@ public class TabulatedFunctions {
         Constructor[] constructors = functionClass.getConstructors();
         for (Constructor constructor : constructors) {
             Class[] types = constructor.getParameterTypes();
-            if (types.length > 0 && types[0].equals(points.getClass())) {
+            //System.out.println(types[0]);
+
+            if (types.length > 0 && types[0].componentType()!=null && types[0].componentType().equals(points[0].getClass())) {
                 try {
                     return (TabulatedFunction) constructor.newInstance(new Object[]{points});
                 } catch (Exception e) {
@@ -103,6 +105,29 @@ public class TabulatedFunctions {
             return null;
         }
     }
+
+    public static TabulatedFunction tabulate(Class<? extends TabulatedFunction> functionClass, Function f, double leftX, double rightX, int pointCount) {
+        try {
+            if (leftX < f.getLeftDomainBorder() || rightX > f.getRightDomainBorder()) {
+                throw new IllegalArgumentException();
+            }
+            FunctionPoint[] points = new FunctionPoint[pointCount];
+            double difference = (rightX - leftX) / (pointCount - 1);
+            points[0] = new FunctionPoint(leftX, f.getFunctionValue(leftX));
+            for (int i = 1; i < pointCount; i++) {
+                points[i] = new FunctionPoint(leftX + i * difference, f.getFunctionValue(leftX + i * difference));
+            }
+            return createTabulatedFunction(functionClass, leftX, rightX, pointCount);
+        }
+        catch (IllegalArgumentException e) {
+            return null;
+        }
+        catch (FunctionPointIndexOutOfBoundsException ex){
+
+        }
+        return null;
+    }
+
 
     public static void outputTabulatedFunction(TabulatedFunction f, OutputStream out) throws IOException, FunctionPointIndexOutOfBoundsException {
         DataOutputStream output = new DataOutputStream(out);

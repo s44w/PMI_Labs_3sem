@@ -27,34 +27,55 @@ public class LinkedListTabulatedFunction implements TabulatedFunction, Function,
         cur = new Node();
     }
 
+    public static class LinkedListTabulatedFunctionFactory implements TabulatedFunctionFactory {
+        @Override
+        public LinkedListTabulatedFunction createTabulatedFunction(double leftX, double rightX, int amount) {
+            return new LinkedListTabulatedFunction(leftX, rightX, amount);
+        }
+
+        @Override
+        public TabulatedFunction createTabulatedFunction(double leftX, double rightX, double[] values) {
+            try {
+                LinkedListTabulatedFunction LL = new LinkedListTabulatedFunction(leftX, rightX, values);
+                return LL;
+            }
+            catch (Exception ex){
+
+            }
+            return null;
+        }
+
+        @Override
+        public TabulatedFunction createTabulatedFunction(FunctionPoint[] points) {
+            try {
+                LinkedListTabulatedFunction LL = new LinkedListTabulatedFunction(points);
+                return LL;
+            }
+            catch (Exception ex){
+
+            }
+            return null;
+        }
+    }
 
     public LinkedListTabulatedFunction(double leftX, double rightX, int pointsCount){
         if (leftX >= rightX || pointsCount < 2) {
             throw new IllegalArgumentException();
         }
 
-        actualLength = pointsCount;
         leftDomainBorder = leftX;
         rightDomainBorder = rightX;
 
-        cur = head;
-
-        cur.point = new FunctionPoint(leftX, 0);
-        cur.next = new Node();
-        cur.next.prev = cur;
-        cur = cur.next;
-        ++curId;
         double deltaX = (rightX - leftX) / (pointsCount - 1);
-        for (int i = 0; i < actualLength; i++) {
-            cur.point = new FunctionPoint(leftX + i*deltaX, 0);
-            cur.next = new Node();
-            cur.next.prev = cur;
-            cur = cur.next;
-            curId++;
+        try {
+            for (int i = 0; i < pointsCount; ++i) {
+                FunctionPoint point = new FunctionPoint(leftX + i * deltaX, 0);
+                addBack(point);
+            }
         }
-        tail = cur.prev;
-        tail.next = head;
-        head.prev = tail;
+        catch (Exception ex){
+
+        }
     }
 
     public LinkedListTabulatedFunction(double leftX, double rightX, double[] values) throws InappropriateFunctionPointException, FunctionPointIndexOutOfBoundsException{
@@ -67,6 +88,25 @@ public class LinkedListTabulatedFunction implements TabulatedFunction, Function,
         for ( ; actualLength < values.length; ++curId) {
             FunctionPoint p = new FunctionPoint(curId*deltaX + leftX, values[curId]);
             addBack(p);
+        }
+    }
+
+    public LinkedListTabulatedFunction(FunctionPoint[] points){
+        if (points.length < 2) {
+            throw new IllegalArgumentException();
+        }
+
+
+        //actualLength = points.length;
+        leftDomainBorder = points[0].getX();
+        rightDomainBorder = points[points.length-1].getX();
+        try {
+            for (int i = 0; i < points.length; ++i) {
+                this.addBack(points[i]);
+            }
+        }
+        catch (Exception ex){
+            return;
         }
     }
 
@@ -433,27 +473,5 @@ public class LinkedListTabulatedFunction implements TabulatedFunction, Function,
             }
         };
     }
-
-
-    public static class LinkedListTabulatedFunctionFactory implements TabulatedFunctionFactory {
-        @Override
-        public LinkedListTabulatedFunction createTabulatedFunction(double leftX, double rightX, int amount) {
-            return new LinkedListTabulatedFunction(leftX, rightX, amount);
-        }
-
-        @Override
-        public TabulatedFunction createTabulatedFunction(double leftX, double rightX, double[] values) {
-            return null;
-        }
-
-        @Override
-        public TabulatedFunction createTabulatedFunction(FunctionPoint[] points) {
-            return null;
-        }
-    }
-
-
-
-
 
 }
